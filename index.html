@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="新生儿坏死性小肠结肠炎（NEC）NICU 血便九环节临床决策训练：真实影像、病例复盘、使用前问卷与教学评价。">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#070D18">
+<meta property="og:type" content="website">
+<meta property="og:title" content="NEC 虚拟病例决策舱 · NICU 血便九环节决策训练">
+<meta property="og:description" content="一例 NEC，从头走到手术台：真实影像、九环节临床决策、病例复盘与教学评价。">
+<title>NEC 虚拟病例决策舱 · NICU 血便九环节决策训练</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="assets/style.css?v=20261018g">
+</head>
+<body>
+<div id="access-gate" style="position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#070D18;color:#E6EDF7;font-family:system-ui,-apple-system,'PingFang SC',sans-serif;padding:24px;">
+  <div style="width:min(420px,94vw);background:#111E33;border:1px solid #22354F;border-radius:16px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+    <div style="font-size:12px;letter-spacing:2px;color:#22D3EE;font-weight:700;margin-bottom:8px;">NEC 训练舱 · 在线版</div>
+    <h2 style="font-size:22px;margin:0 0 8px;">请输入访问码</h2>
+    <p style="font-size:13px;line-height:1.7;color:#9FB2CC;margin:0 0 18px;">仅限教学使用。访问码请向黄老师或科室教学秘书索取。</p>
+    <input id="access-code" type="password" autocomplete="off" placeholder="访问码"
+      style="width:100%;box-sizing:border-box;background:#0B1424;border:1px solid #22354F;border-radius:10px;color:#E6EDF7;padding:12px 14px;font-size:15px;outline:none;">
+    <div id="access-err" style="min-height:20px;color:#FCA5A5;font-size:12px;margin:8px 0 4px;"></div>
+    <button id="access-enter" type="button" style="width:100%;border:0;border-radius:999px;padding:13px;background:linear-gradient(120deg,#22D3EE,#38BDF8);color:#04121C;font-weight:800;font-size:15px;cursor:pointer;">进入训练</button>
+    <p style="font-size:11px;line-height:1.6;color:#63799A;margin:14px 0 0;">访问码只是减少误入，不是医疗级安全措施；请勿转发链接与患者影像。</p>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY='nec_online_ok';
+  var gate=document.getElementById('access-gate');
+  try{ if(sessionStorage.getItem(KEY)==='1'){ gate.remove(); return; } }catch(e){}
+  var input=document.getElementById('access-code');
+  var err=document.getElementById('access-err');
+  function enter(){
+    if(input.value.trim()==='NEC2026'){
+      try{ sessionStorage.setItem(KEY,'1'); }catch(e){}
+      gate.remove();
+    } else { err.textContent='访问码不正确，请重新输入'; input.select(); }
+  }
+  document.getElementById('access-enter').addEventListener('click',enter);
+  input.addEventListener('keydown',function(e){ if(e.key==='Enter') enter(); });
+  setTimeout(function(){ input.focus(); },100);
+})();
+</script>
+
+<noscript><div style="padding:24px;color:#E6EDF7;background:#070D18;font-family:sans-serif;">本训练需要启用 JavaScript 才能运行，请在浏览器设置中开启后刷新页面。</div></noscript>
+<div class="backdrop"></div>
+
+<div class="app">
+
+  <!-- ================= 开始页 ================= -->
+  <section id="screen-start" class="screen active">
+    <div class="start-card">
+      <div class="start-badge">虚拟病例决策舱 · V1.3 · 在线版</div>
+      <h1 class="start-title">一例 NEC，从头走到手术台</h1>
+      <p class="start-sub">NICU 血便全程决策训练　·　九个环节　·　真实影像与患儿录像</p>
+      <p class="start-org">郑州大学第三附属医院（河南省妇幼保健院）新生儿外科 · 新生儿科</p>
+
+      <div class="ecg-wrap">
+        <svg viewBox="0 0 600 74" preserveAspectRatio="none" aria-hidden="true">
+          <path class="ecg-path" d="M0,37 L118,37 L130,37 L139,13 L149,60 L159,37 L248,37 L260,37 L269,19 L279,53 L289,37 L398,37 L410,37 L419,15 L429,57 L439,37 L600,37"/>
+        </svg>
+      </div>
+
+      <div class="start-stats">
+        <div class="stat-chip"><b>9</b><span>训练环节</span></div>
+        <div class="stat-chip"><b>10</b><span>张真实影像</span></div>
+        <div class="stat-chip"><b>1</b><span>段患儿录像</span></div>
+        <div class="stat-chip"><b>4</b><span>训练模块</span></div>
+      </div>
+
+      <div class="start-actions">
+        <button class="btn" type="button" data-open-flow>开始训练 · NICU 血便九环节</button>
+        <button class="btn ghost" id="btn-roster-open" type="button">✎ 使用登记</button>
+        <button class="btn ghost" id="btn-gallery-start" type="button">▣ 影像资料库</button>
+      </div>
+      <p class="start-alt">
+        从 <b>NICU</b> 开始，以「大便带血」为首发症状，一路走到<b>肠穿孔手术</b>和术后管理。
+        没有产房环节 —— 由你主导判断；诊断明确后与小儿外科共同约定升级条件，是一条线上的接力，而不是两科分头决策。
+      </p>
+      <p class="start-org" style="margin-top:10px;">仅供教学使用 · 影像已做身份脱敏 · 请勿公开传播 · 在线版
+        <button type="button" id="btn-clear-local" style="background:none;border:0;color:var(--text-3);text-decoration:underline;cursor:pointer;font:inherit;padding:0;margin-left:10px;">清除本机数据</button>
+      </p>
+
+      <div class="start-modules">
+        <button class="start-mod hi" type="button" data-open-flow>
+          <div class="sm-kicker">模块 A · 全程病例</div>
+          <div class="sm-name">血便九环节决策训练</div>
+          <div class="sm-desc">临床症状 → 查体 → 辅助检查 → 诊断 → 外科会诊 → 内科治疗 → 病情转折 → 手术决策 → 术后管理。每个环节先弹出真实影像，再让你做判断；都可以选「暂不处理」，并看到代价。</div>
+        </button>
+        <button class="start-mod" type="button" data-open-survey="home">
+          <div class="sm-kicker">模块 B · 使用前问卷</div>
+          <div class="sm-name">先告诉我们你是谁</div>
+          <div class="sm-desc">基本信息与基线能力自评（约 10 题）。使用意愿、内容偏好与推送意愿在训练结束后填写，用于前后对比。</div>
+        </button>
+        <button class="start-mod" type="button" data-open-eval="home">
+          <div class="sm-kicker">模块 C · 教学评价表</div>
+          <div class="sm-name">给这套训练打个分</div>
+          <div class="sm-desc">覆盖反应层与部分学习层自评：分项评分、自信心变化、自编认知负荷感知（3 题）、中文版 SUS（10 条完整计分）。结果可复制汇总。</div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 九环节决策训练（血便病例） ================= -->
+  <section id="screen-flow" class="screen">
+    <div class="topbar">
+      <div>
+        <div class="case-no" id="flow-case-no">NEC-2026-002</div>
+        <div class="case-title">一例新生儿血便 · 九环节临床决策训练</div>
+      </div>
+      <div class="stage-track" id="flow-track"></div>
+      <div class="topbar-right">
+        <div class="score-live">累计得分 <b id="flow-score" aria-live="polite">0</b></div>
+        <button class="btn small ghost" id="btn-flow-quit">退出训练</button>
+      </div>
+    </div>
+
+    <div class="workspace">
+      <!-- 左栏 -->
+      <div class="col-left">
+        <div class="panel">
+          <div class="panel-head"><span class="dot"></span>患儿状态</div>
+          <div class="panel-body"><div class="vitals-grid" id="flow-vitals"></div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="dot"></span>检验指标</div>
+          <div class="panel-body" id="flow-labs"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><span class="dot"></span>临床状态</div>
+          <div class="panel-body"><div class="flag-list" id="flow-flags"></div></div>
+        </div>
+      </div>
+
+      <!-- 中栏 -->
+      <div class="col-mid">
+        <div class="stream-head">
+          <div>
+            <div class="stage-name" id="flow-step-name">环节一 · 临床症状</div>
+            <div class="stage-time" id="flow-step-time">生后第 11 天 · 08:20</div>
+          </div>
+        </div>
+        <div class="stream" id="flow-stream" role="log" aria-live="polite" aria-relevant="additions"></div>
+      </div>
+
+      <!-- 右栏 -->
+      <div class="col-right">
+        <div class="panel" style="display:flex;flex-direction:column;height:100%;">
+          <div class="panel-head"><span class="dot"></span>本环节可选动作</div>
+          <div class="action-scroll" id="flow-actions"></div>
+          <div class="advance-bar">
+            <div class="advance-hint" id="flow-hint">勾选你认为必须完成的动作</div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn small" id="btn-flow-submit" disabled>提交本环节</button>
+              <button class="btn small ghost" id="btn-flow-next" disabled>进入下一环节</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 环节失败 ================= -->
+  <section id="screen-flow-fail" class="screen">
+    <div class="fail-wrap">
+      <div class="fail-mark">!</div>
+      <div class="fail-step" id="fail-step">环节一 · 临床症状</div>
+      <h2 class="fail-title" id="fail-title">—</h2>
+      <div class="fail-lesson" id="fail-lesson"></div>
+      <div class="fail-actions">
+        <button class="btn" id="btn-flow-retry">重打本环节</button>
+        <button class="btn ghost" id="btn-flow-home">返回首页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 全程训练结算 ================= -->
+  <section id="screen-flow-summary" class="screen">
+    <div class="sum-wrap">
+      <div class="sum-hero">
+        <div class="kicker">训练结束</div>
+        <h2 id="flow-sum-title">九环节全程复盘</h2>
+        <div class="grade-line">综合得分 <b id="flow-sum-score">0</b> / <span id="flow-sum-max">900</span>
+          <span class="sum-pct">　得分率 <b id="flow-sum-pct">0%</b></span>
+          <span class="sum-grade" id="flow-sum-grade">—</span>
+        </div>
+      </div>
+
+      <div class="sum-grid">
+        <div class="card">
+          <h3><span class="bar"></span>九个环节得分</h3>
+          <div class="fs-list" id="flow-sum-list"></div>
+        </div>
+        <div class="card">
+          <h3><span class="bar"></span>九个能力维度</h3>
+          <div class="fs-list" id="flow-sum-dims"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <h3><span class="bar"></span>这一例真正的分水岭</h3>
+        <div class="sum-insight" id="flow-sum-insight"></div>
+      </div>
+
+      <div class="sum-post-tip" id="flow-sum-posttip" hidden>
+        <div class="spt-txt">
+          <b>还有一份「使用后问卷」</b>
+          <span>训练已经做完，这时候评价才准。约 3 分钟，包括使用意愿、内容偏好与推送意愿。</span>
+        </div>
+        <button class="btn small" id="btn-post-survey">去填写</button>
+      </div>
+
+      <div class="sum-foot">
+        <button class="btn" id="btn-flow-review">病例复盘与指南要点</button>
+        <button class="btn ghost" id="btn-demo-open">病理演变演示</button>
+        <button class="btn ghost" type="button" id="btn-post-survey2" data-open-survey="post" data-sections="C,D,E">使用后问卷</button>
+        <button class="btn ghost" type="button" data-open-eval="flow">教学评价表</button>
+        <button class="btn ghost" id="btn-flow-copy">复制训练结果</button>
+        <button class="btn ghost" id="btn-flow-restart">再做一次</button>
+        <button class="btn ghost" id="btn-flow-back">返回首页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 使用前问卷 ================= -->
+  <section id="screen-survey" class="screen">
+    <div class="doc-wrap">
+      <div class="doc-head">
+        <div class="doc-kicker">使用前问卷 · 模块 B</div>
+        <h2 class="doc-title">先花两分钟，让我们知道你是谁</h2>
+        <p class="doc-sub">
+          问卷分两部分：基本信息与基线能力自评（约 10 题）。使用意愿、内容偏好与推送意愿
+          在训练结束后填写，用于训练前后的对比。各部分的维度与措辞参考了国内外公开文献。
+          所有填写内容只保存在本机浏览器，不会自动上传到任何服务器；如需汇总，请使用回执/复制功能自行发送。
+        </p>
+      </div>
+      <div class="doc-scroll" id="survey-scroll">
+        <div class="sv-saved" id="sv-saved"></div>
+        <div id="survey-list"></div>
+      </div>
+      <div class="doc-bar">
+        <div class="doc-prog">
+          <div class="doc-prog-track"><i id="sv-progress-fill"></i></div>
+          <div class="doc-prog-txt">已填 <span id="sv-progress-txt">0 / 0</span> 题（只有标注「必填」的必须回答）</div>
+        </div>
+        <div class="doc-bar-btns">
+          <button class="btn small ghost" id="survey-reset">清空重填</button>
+          <button class="btn small" id="survey-submit">提交问卷</button>
+          <button class="btn small ghost" id="survey-back2">返回</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 教学评价表 ================= -->
+  <section id="screen-eval" class="screen">
+    <div class="doc-wrap">
+      <div class="doc-head">
+        <div class="doc-kicker">教学评价表 · 模块 C</div>
+        <h2 class="doc-title">给这套训练打个分</h2>
+        <p class="doc-sub">
+          本表覆盖 Kirkpatrick 反应层与部分学习层自评：分项评分与满意度、自信心变化、
+          自编认知负荷感知（3 题，探索性）、系统可用性（中文版 SUS，必须答满 10 条才计分）。
+          结果只保存在本机浏览器；可点「复制评价结果」自行汇总，不会自动上传。
+        </p>
+      </div>
+      <div class="doc-scroll" id="eval-scroll">
+        <div class="sv-saved" id="ev-saved"></div>
+        <div id="eval-body"></div>
+      </div>
+      <div class="doc-bar">
+        <div class="doc-prog">
+          <div class="doc-prog-track"><i id="ev-progress-fill"></i></div>
+          <div class="doc-prog-txt">已完成 <span id="ev-progress-txt">0 / 0</span> 项　·　分项均分 <span id="ev-avg">—</span></div>
+        </div>
+        <div class="doc-bar-btns">
+          <button class="btn small ghost" id="eval-reset">清空重填</button>
+          <button class="btn small" id="eval-submit">提交评价表</button>
+          <button class="btn small ghost" id="btn-eval-copy">复制评价结果</button>
+          <button class="btn small ghost" id="eval-back2">返回</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================= 剧情播放层（通用 AVG） ================= -->
+<div id="story-mask" class="modal-mask rpg" role="dialog" aria-modal="true" aria-label="剧情播放">
+  <div class="rpg-stage">
+    <div class="rpg-scene" id="rpg-scene"></div>
+
+    <div class="rpg-portraits">
+      <div class="rpg-portrait left" id="rpg-p-left"></div>
+      <div class="rpg-portrait right" id="rpg-p-right"></div>
+    </div>
+
+    <div class="rpg-hud">
+      <div class="rpg-mood" id="rpg-mood-box">
+        <div class="rpg-mood-label">家属情绪</div>
+        <div class="rpg-mood-track"><div class="rpg-mood-fill" id="mood-fill"></div></div>
+        <div class="rpg-mood-val" id="mood-val">42</div>
+      </div>
+      <div class="rpg-chapter" id="rpg-chapter"></div>
+    </div>
+
+    <div class="rpg-choices" id="rpg-choices"></div>
+
+    <div class="rpg-dialog" id="rpg-dialog" tabindex="-1">
+      <div class="rpg-dialog-inner">
+        <div class="rpg-name" id="rpg-name">旁白</div>
+        <div class="rpg-text" id="rpg-text"></div>
+        <div class="rpg-next" id="rpg-next">▼</div>
+      </div>
+      <div class="rpg-corner tl"></div>
+      <div class="rpg-corner tr"></div>
+      <div class="rpg-corner bl"></div>
+      <div class="rpg-corner br"></div>
+    </div>
+
+    <button class="rpg-skip" id="btn-story-skip">跳过 ▸▸</button>
+  </div>
+</div>
+
+<!-- ================= 阶段过场 ================= -->
+<div id="transit-mask" class="transit-mask" aria-hidden="true">
+  <div class="transit-inner">
+    <div class="transit-num" id="transit-num">01</div>
+    <div class="transit-name" id="transit-name">产前</div>
+    <div class="transit-line"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ================= 影像查看器 ================= -->
+<div id="image-mask" class="modal-mask" role="dialog" aria-modal="true" aria-labelledby="image-title" aria-hidden="true">
+  <div class="image-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">检查结果</div>
+        <h3 id="image-title">影像查看</h3>
+      </div>
+      <button class="modal-x" id="btn-image-close" aria-label="关闭">✕</button>
+    </div>
+    <div class="image-body" id="image-body"></div>
+    <div class="modal-foot">
+      <span class="modal-note">全部影像均为真实临床或已发表文献图片，已做身份信息脱敏；仅用于征象识别训练，不作为诊断依据</span>
+      <button class="btn small ghost" id="btn-image-close2">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 影像资料库 ================= -->
+<div id="gallery-mask" class="modal-mask" role="dialog" aria-modal="true" aria-labelledby="gallery-title" aria-hidden="true">
+  <div class="gallery-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">影像资料库</div>
+        <h3 id="gallery-title">真实临床影像一览</h3>
+      </div>
+      <button class="modal-x" id="btn-gallery-close" aria-label="关闭">✕</button>
+    </div>
+    <div class="image-modebar">
+      <span class="gallery-count" id="gallery-count"></span>
+    </div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <div class="modal-foot">
+      <span class="modal-note">影像全部为真实临床或已发表文献图片，均已做身份信息脱敏。外部开放获取素材：气腹片（CC BY 4.0）、NICU 早期腹平片（CC BY-NC-SA 4.0，仅供非商业教学）、正常肠管超声（CC BY 4.0）、呼吸窘迫胸片（CC0）· 点击任意影像可放大查看</span>
+      <button class="btn small ghost" id="btn-gallery-close2">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 病理演变演示 ================= -->
+<div id="demo-mask" class="modal-mask" role="dialog" aria-modal="true" aria-labelledby="demo-title" aria-hidden="true">
+  <div class="image-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">动态演示</div>
+        <h3 id="demo-title">从肠壁积气到气腹</h3>
+      </div>
+      <button class="modal-x" id="btn-demo-close" aria-label="关闭">✕</button>
+    </div>
+    <div class="demo-body" id="demo-body"></div>
+    <div class="demo-steps" id="demo-steps"></div>
+    <div class="modal-foot">
+      <span class="modal-note">演示肠壁缺血、积气、穿孔与气腹的连续过程</span>
+      <div style="display:flex;gap:10px;">
+        <button class="btn small ghost" id="btn-demo-replay">重新播放</button>
+        <button class="btn small" id="btn-demo-close2">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 大图弹层：图片先蹦出来 ================= -->
+<div id="pop-mask" class="pop-mask" role="dialog" aria-modal="true" aria-labelledby="pop-title" aria-hidden="true">
+  <div class="pop-head">
+    <div class="pop-step" id="pop-step"></div>
+    <div class="pop-title" id="pop-title"></div>
+  </div>
+  <div class="pop-media" id="pop-media"></div>
+  <div class="pop-foot">
+    <div class="pop-note" id="pop-note"></div>
+    <button class="btn" id="btn-pop-ok">我看清了，继续</button>
+  </div>
+</div>
+
+<!-- ================= 病例系统回顾 ================= -->
+<div id="review-mask" class="modal-mask" role="dialog" aria-modal="true" aria-labelledby="review-title" aria-hidden="true">
+  <div class="review-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">点评环节</div>
+        <h3 id="review-title">病例系统回顾与指南要点</h3>
+      </div>
+      <button class="modal-x" id="btn-review-close" aria-label="关闭">✕</button>
+    </div>
+    <div class="review-body" id="review-body"></div>
+    <div class="modal-foot">
+      <span class="modal-note" id="review-refs"></span>
+      <button class="btn small ghost" id="btn-review-close2">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 使用登记 ================= -->
+<div id="roster-mask" class="modal-mask" role="dialog" aria-modal="true" aria-labelledby="roster-title" aria-hidden="true">
+  <div class="image-box roster-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-kicker">使用登记 · 模块 D</div>
+        <h3 id="roster-title">先留个名字</h3>
+      </div>
+      <button class="modal-x" id="btn-roster-close" aria-label="关闭">✕</button>
+    </div>
+
+    <div class="roster-body">
+      <p class="roster-tip">
+        登记分两步：<b>先填基本信息，再填使用前问卷，两步都完成才算登记成功。</b>
+        信息只保存在你自己的浏览器里，不会自动上传；如需汇总，请点「复制登记信息」发送给黄老师或科室群。
+        问卷与训练结果同理，只有你主动复制才会离开本机。
+      </p>
+
+      <div class="roster-form" id="roster-form">
+        <label class="rf">
+          <span>姓名 <i>*</i></span>
+          <input id="rf-name" type="text" placeholder="请输入姓名" maxlength="20" autocomplete="off">
+          <em class="rf-tip" id="rf-name-tip" hidden>请填写姓名后再继续</em>
+        </label>
+        <label class="rf">
+          <span>单位 / 科室</span>
+          <input id="rf-org" type="text" maxlength="40" autocomplete="off">
+        </label>
+        <label class="rf">
+          <span>身份</span>
+          <select id="rf-role">
+            <option>住院医师</option>
+            <option>规培医师</option>
+            <option>进修医师</option>
+            <option>主治医师</option>
+            <option>护士</option>
+            <option>医学生</option>
+            <option>其他</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="roster-done" id="roster-done" hidden>
+        <div class="rd-ok">✓ 已登记</div>
+        <pre id="roster-receipt"></pre>
+        <p class="rd-tip">请点下面的「复制登记信息」，把这段文字发给<b>黄老师</b>，或粘贴到科室群里。</p>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <span class="modal-note" id="roster-note">带 * 为必填</span>
+      <div style="display:flex;gap:10px;">
+        <button class="btn small ghost" id="btn-roster-copy" hidden>复制登记信息</button>
+        <button class="btn small ghost" id="btn-roster-go" hidden>开始训练</button>
+        <button class="btn small" id="btn-roster-save">下一步 · 填问卷</button>
+        <button class="btn small ghost" id="btn-roster-close2">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/imaging.js?v=20261018g"></script>
+<script src="assets/art.js?v=20261018g"></script>
+<script src="assets/review.js?v=20261018g"></script>
+<script src="assets/app.js?v=20261018g"></script>
+<script src="assets/flow_case.js?v=20261018g"></script>
+<script src="assets/flow.js?v=20261018g"></script>
+<script src="assets/survey.js?v=20261018g"></script>
+<script src="assets/evalform.js?v=20261018g"></script>
+<script src="assets/roster.js?v=20261018g"></script>
+</body>
+</html>
