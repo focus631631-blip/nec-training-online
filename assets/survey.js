@@ -483,10 +483,10 @@
     if (!k || !t || !s) return;
 
     if (activeSecs && activeSecs.indexOf('C') >= 0) {
-      // 后测
-      k.textContent = '使用后问卷 · 训练结束';
-      t.textContent = '训练做完了，说说真实感受';
-      s.textContent = '这一部分问三件事：使用意愿、内容偏好与推送意愿。题目依据 TAM／UTAUT 等公开文献的维度整理。所有填写内容只保存在本机浏览器，不会自动上传；如需汇总，请使用登记回执或复制功能自行发送。';
+      // 后测（完整问卷，训练结束后）
+      k.textContent = '训练后问卷 · 全部五部分';
+      t.textContent = '训练做完了，把这份问卷填完';
+      s.textContent = '问卷分五部分：基本信息、基线能力自评、使用意愿、使用场景与内容偏好、推送意愿与留言。基线自评请对照「训练前」的状态作答，其余按训练后的真实感受填写。所有填写内容只保存在本机浏览器，不会自动上传；如需汇总，请使用登记回执或复制功能自行发送。';
     } else if (activeSecs) {
       // 前测
       k.textContent = '使用前问卷 · 登记第 2 步';
@@ -502,7 +502,10 @@
   function open(fromPage, secs) {
     flushSave();               // 切换视图前先把上一视图的作答落盘
     from = fromPage || 'home';
-    if (fromPage !== 'roster' && window.ROSTER && typeof window.ROSTER.endSurveyFlow === 'function') {
+    /* 'post' 表示从结算页进入的「训练后问卷」，需要打上来自登记的标记 */
+    if (fromPage === 'post' && window.ROSTER && typeof window.ROSTER.beginSurveyFlow === 'function') {
+      window.ROSTER.beginSurveyFlow();
+    } else if (fromPage !== 'roster' && window.ROSTER && typeof window.ROSTER.endSurveyFlow === 'function') {
       window.ROSTER.endSurveyFlow();
     }
     /* 默认只发前测（A+B）：后测 C/D/E 只在结算页之后出现（D07） */

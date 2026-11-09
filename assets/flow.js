@@ -128,13 +128,18 @@
   }
 
   /* 弹出大图；popImage 不可用时静默跳过。
-     弹层出问题也不能阻断训练流程，所以整段包在 try 里。 */
+     弹层出问题也不能阻断训练流程，所以整段包在 try 里。
+     spec 可以是单个对象，也可以是数组——数组按顺序逐张弹出（如术中先看麻醉消毒铺巾，再看坏死肠段）。 */
   async function showVisual(spec, stepLabel) {
-    if (!spec || typeof popImage !== 'function') return;
-    try {
-      await popImage(spec, { step: stepLabel, note: spec.note });
-    } catch (e) {
-      if (typeof closePop === 'function') closePop();
+    if (!spec) return;
+    const list = Array.isArray(spec) ? spec : [spec];
+    for (const one of list) {
+      if (!one || typeof popImage !== 'function') continue;
+      try {
+        await popImage(one, { step: stepLabel, note: one.note });
+      } catch (e) {
+        if (typeof closePop === 'function') closePop();
+      }
     }
   }
 
@@ -164,15 +169,17 @@
      左栏：患儿状态
      ============================================================ */
   const VITAL_DEFS = [
-    { key: 'hr',   label: '心率',   unit: '次/分', bad: v => v > 180, warn: v => v > 165 },
+    { key: 'hr',   label: '心率',   unit: '次/分', bad: v => v > 183, warn: v => v > 172 },
     { key: 'rr',   label: '呼吸',   unit: '次/分', bad: v => v > 70,  warn: v => v > 62 },
     { key: 'bp',   label: '血压',   unit: 'mmHg',  raw: true },
     { key: 'temp', label: '体温',   unit: '℃',     bad: v => v >= 38, warn: v => v >= 37.5 },
     { key: 'spo2', label: '血氧',   unit: '%',     bad: v => v < 90,  warn: v => v < 94 },
-    { key: 'abd',  label: '腹围',   unit: 'cm',    bad: v => v >= 36, warn: v => v >= 33 }
+    { key: 'abd',  label: '腹围',   unit: 'cm',    bad: v => v >= 31.5, warn: v => v >= 29.5 }
   ];
   const LAB_DEFS = [
-    { key: 'crp', label: 'C 反应蛋白', unit: 'mg/L' },
+    { key: 'ph',  label: 'pH',         unit: '' },
+    { key: 'pco2',label: '二氧化碳分压', unit: 'mmHg' },
+    { key: 'crp', label: 'C 反应蛋白', unit: 'mg/dL' },
     { key: 'plt', label: '血小板',     unit: '×10⁹/L' },
     { key: 'lac', label: '乳酸',       unit: 'mmol/L' },
     { key: 'be',  label: '碱剩余',     unit: 'mmol/L' },
@@ -191,12 +198,20 @@
         if (raw === undefined || raw === null) return;
         const num = parseFloat(raw);
         let cls = '';
-        if (!d.raw && !isNaN(num)) {
+        if (d.key === 'bp') {
+          /* 血压按平均动脉压（MAP）着色：MAP = (收缩压 + 2×舒张压) / 3 */
+          const m = String(raw).match(/(\d+)\s*\/\s*(\d+)/);
+          if (m) {
+            const map = (+m[1] + 2 * (+m[2])) / 3;
+            if (map < 30) cls = ' bad';
+            else if (map < 35) cls = ' warn';
+          }
+        } else if (!d.raw && !isNaN(num)) {
           if (d.bad && d.bad(num)) cls = ' bad';
           else if (d.warn && d.warn(num)) cls = ' warn';
         }
         const div = document.createElement('div');
-        div.className = 'vit' + cls;
+        div.className = 'vit' + cls + (d.key === 'bp' ? ' vit-bp' : '');
         div.innerHTML = `<div class="vit-k">${d.label}</div>
           <div class="vit-v">${raw}<span class="vit-u">${d.unit}</span></div>`;
         vg.appendChild(div);
@@ -208,10 +223,12 @@
       LAB_DEFS.forEach(d => {
         const v = p.labs[d.key];
         if (v === undefined) return;
+        // CRP 用 mg/dL，保留一位小数（3.0 / 6.8 / 7.8），避免显示成整数 3
+        const shown = d.key === 'crp' && !isNaN(parseFloat(v)) ? Number(v).toFixed(1) : v;
         const div = document.createElement('div');
         div.className = 'lab';
         div.innerHTML = `<span class="lab-k">${d.label}</span>
-          <span class="lab-v">${v}<span class="lab-u">${d.unit}</span></span>`;
+          <span class="lab-v">${shown}<span class="lab-u">${d.unit}</span></span>`;
         lb.appendChild(div);
       });
       if (p.note) {
@@ -236,6 +253,80 @@
   /* ============================================================
      右栏：动作面板
      ============================================================ */
+  /* ============================================================
+     检查结果页：环节三提交后，按「学生选了什么」依次出结果
+     顺序：腹部平片（一页）→ 腹部超声（一页）→ 血常规/CRP（一页）
+           → 凝血（一页）→ 血气/电解质/血糖（一页）→ 大便/血培养（一页，如选）
+     ============================================================ */
+  function labCardHTML(res) {
+    const rows = (res.rows || []).map(r =>
+      `<div class="pl-row"><span>${r[0]}</span><b>${r[1]}</b>${r[2] ? `<i>${r[2]}</i>` : ''}</div>`).join('');
+    return `<div class="pop-lab">
+      <div class="pl-body">${rows}</div>
+      ${res.foot ? `<div class="pl-foot">${res.foot}</div>` : ''}
+    </div>`;
+  }
+
+  /* 环节三结束后：按选择结果逐页展示 */
+  async function showWorkupResults(picked) {
+    const step = FC.steps.find(s => s.key === 'workup');
+    if (!step) return;
+    const act = id => step.actions.find(a => a.id === id);
+    const pages = [];
+
+    const imgPage = id => {
+      const a = act(id);
+      if (!a || !a.imaging) return;
+      pages.push({
+        spec: { ...a.imaging, fixedFrame: true, title: a.imaging.title },
+        note: (a.result && a.result.note) || ''
+      });
+    };
+    const labPage = id => {
+      const a = act(id);
+      if (!a || !a.result) return;
+      pages.push({
+        spec: { html: labCardHTML(a.result), title: a.result.title || '检查结果' },
+        note: ''
+      });
+    };
+
+    imgPage('f3a1');                 // 先片子（一页）
+    imgPage('f3a2');                 // 再超声（一页，与片子同样大小）
+    labPage('f3a4');                 // 血常规 / CRP / PCT
+    labPage('f3a6');                 // 凝血功能
+
+    /* 血气 + 电解质/血糖合并一页 */
+    if (picked.has('f3a3') || picked.has('f3a8')) {
+      const rows = [];
+      const gas = act('f3a3'), elec = act('f3a8');
+      if (gas && picked.has('f3a3')) rows.push(...(gas.result.rows || []));
+      if (elec && picked.has('f3a8')) rows.push(...(elec.result.rows || []));
+      const foot = [gas && picked.has('f3a3') ? '血气 03:02 报告' : '', elec && picked.has('f3a8') ? '电解质/血糖 03:10 报告' : ''].filter(Boolean).join(' · ');
+      pages.push({ spec: { html: labCardHTML({ rows, foot }), title: '血气 · 电解质 · 血糖' }, note: '' });
+    }
+
+    /* 大便常规 + 血培养合并一页 */
+    const stool = act('f3a7'), culture = act('f3a5');
+    if ((stool && picked.has('f3a7')) || (culture && picked.has('f3a5'))) {
+      const rows = [];
+      if (stool && picked.has('f3a7')) rows.push(...(stool.result.rows || []));
+      if (culture && picked.has('f3a5')) rows.push(...(culture.result.rows || []));
+      pages.push({ spec: { html: labCardHTML({ rows, foot: '大便培养 / 血培养需 48 h 出终报' }), title: '大便常规 · 血培养' }, note: '' });
+    }
+
+    if (!pages.length) return;
+    for (let i = 0; i < pages.length; i++) {
+      const item = pages[i];
+      try {
+        await popImage(item.spec, {
+          step: `检查结果 ${i + 1} / ${pages.length}`,
+          note: item.note
+        });
+      } catch (e) { /* 忽略 */ }
+    }
+  }
+
   function renderActions(step) {
     const box = $('#flow-actions');
     if (!box) return;
@@ -261,8 +352,9 @@
         btn.innerHTML = `<span class="fa-box"></span><span class="fa-txt">${a.label}</span>`;
         btn.addEventListener('click', () => {
           if (st.submitted) return;
-          if (st.picked.has(a.id)) st.picked.delete(a.id);
-          else st.picked.add(a.id);
+          const willPick = !st.picked.has(a.id);
+          if (willPick) st.picked.add(a.id);
+          else st.picked.delete(a.id);
           const on = st.picked.has(a.id);
           btn.classList.toggle('on', on);
           btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -298,8 +390,9 @@
     if (!btn) return;
     const n = st.picked.size;
     btn.disabled = st.submitted || n === 0;
-    btn.textContent = st.submitted ? '本环节已提交' : `提交本环节（已选 ${n} 项）`;
+    btn.textContent = st.submitted ? '已提交' : `提交（已选 ${n} 项）`;
     if (hint && !st.submitted) {
+      hint.classList.remove('hint-score');
       hint.textContent = n === 0 ? '勾选你认为必须完成的动作' : '可以多选，想清楚再提交';
     }
   }
@@ -345,7 +438,7 @@
     saveSession();
 
     /* ① 先把影像一张张弹出来 —— 让学生先看，再读 */
-    const imgActions = step.actions.filter(a => st.picked.has(a.id) && a.imaging);
+    const imgActions = step.actions.filter(a => st.picked.has(a.id) && a.imaging && step.key !== 'workup');
     try {
       for (const a of imgActions) {
         await showVisual({ ...a.imaging, note: a.label }, `环节 ${step.index} · ${step.name}`);
@@ -398,9 +491,14 @@
     btn.textContent = '本环节已提交';
     const next = $('#btn-flow-next');
     next.disabled = false;
-    next.textContent = (st.step === FC.steps.length - 1) ? '完成训练，查看结果' : '进入下一环节';
+    next.textContent = (st.step === FC.steps.length - 1) ? '完成，看结果' : '下一环节';
     const hint = $('#flow-hint');
-    if (hint) hint.textContent = '中栏标出了每一条判断的依据，可点击影像放大';
+    if (hint) {
+      hint.classList.add('hint-score');
+      hint.innerHTML = `本环节得分 <b>${r.score}</b> / ${STEP_MAX}`
+        + ` · 关键动作 ${r.must.length - r.mustMiss.length}/${r.must.length} 完成`
+        + (badPick ? ` · ${badPick} 项不恰当` : '');
+    }
   }
 
   function attachImaging(node, spec) {
@@ -519,6 +617,41 @@
   }
 
   /* ============================================================
+     环节三 · 床旁影像（肚子 / 皮肤 / 肺部）
+     腹部视图内合并床旁超声：超声本身就是腹部检查，不再单列一页。
+     ============================================================ */
+  const MEDIA_SETS = {
+    abdomen: {
+      html: `<figure class="mm-photo">
+          <img src="assets/real/us_bedside.jpg" alt="床旁超声扫查"/>
+          <figcaption>床旁超声 · 探头扫查腹部，评估肠壁积气、腹腔积液与肠壁血流</figcaption>
+        </figure>`,
+      cap: '床旁超声 · 同一时点的床旁扫查：肠壁内见点状强回声，提示肠壁积气；腹腔未见明显积液。'
+    },
+    skin: {
+      html: `<img src="assets/real/skin_mottling.jpg" alt="皮肤发花"/>`,
+      cap: '皮肤 · 花斑纹（大理石样皮纹），提示外周灌注不足，需结合肢端温度与毛细血管充盈时间判断'
+    },
+    lung: {
+      html: `<video src="assets/real/lung_distress.mp4" poster="assets/real/lung_distress.jpg"
+                    controls autoplay muted loop playsinline preload="auto"></video>`,
+      cap: '呼吸 · 呼吸增快、胸壁凹陷，提示呼吸功增加，与腹胀抬高膈肌有关'
+    }
+  };
+
+  function renderMedia(key) {
+    const stage = $('#flow-media-stage');
+    const m = MEDIA_SETS[key];
+    if (!stage || !m) return;
+    stage.innerHTML = `<div style="width:100%">
+        <div style="display:grid;place-items:center">${m.html}</div>
+        <div class="mm-cap">${m.cap}</div>
+      </div>`;
+    document.querySelectorAll('.mm-tab').forEach(b =>
+      b.classList.toggle('on', b.dataset.media === key));
+  }
+
+  /* ============================================================
      进入环节
      ============================================================ */
   async function enterStep(withTransition = true) {
@@ -532,11 +665,23 @@
     renderPatient(step);
     renderActions(step);
 
+    /* 环节专属模块：环节三床旁影像、环节四辅助检查结果 */
+    const mediaMod = $('#flow-media-module');
+    const labMod = $('#flow-lab-module');
+    if (mediaMod) {
+      mediaMod.hidden = step.key !== 'workup';
+      if (step.key === 'workup') renderMedia('abdomen');
+    }
+    if (labMod) labMod.hidden = step.key !== 'diagnosis';
+
     const next = $('#btn-flow-next');
     next.disabled = true;
-    next.textContent = '进入下一环节';
+    next.textContent = '下一环节';
     const hint = $('#flow-hint');
-    if (hint) hint.textContent = '勾选你认为必须完成的动作';
+    if (hint) {
+      hint.classList.remove('hint-score');
+      hint.textContent = '勾选你认为必须完成的动作';
+    }
 
     if (withTransition) await playTransition({ index: step.index, name: step.name });
     if (myRun !== runId) return;
@@ -554,6 +699,27 @@
       <div class="text">${step.lead}</div>
       <div class="task"><b>你的任务　</b>${step.task}</div>
     </div>`);
+
+    /* 现病史：环节一先把病史摆出来，问诊才有依据 */
+    if (step.hpi && FC.meta && FC.meta.patient && FC.meta.patient.hpi) {
+      const p = FC.meta.patient;
+      flowPush(`<div class="hpi-card">
+        <div class="hpi-head"><span class="hpi-tag">现病史</span>
+          <span class="hpi-meta">${p.gender} · 胎龄 ${p.ga} · 出生体重 ${p.bw} · ${p.dol}</span></div>
+        <div class="hpi-body">${p.hpi}</div>
+        <div class="hpi-foot">Apgar ${p.apgar}　|　${p.resp}</div>
+      </div>`);
+    }
+
+    /* 环节内嵌影像：留在中栏，不随弹层关闭而消失 */
+    if (step.inlineVisual) {
+      const iv = step.inlineVisual;
+      flowPush(`<div class="inline-visual">
+        <div class="iv-head"><span class="iv-tag">床旁实景</span><span class="iv-title">${iv.title || ''}</span></div>
+        <div class="iv-media">${iv.html || ''}</div>
+        ${iv.note ? `<div class="iv-note">${iv.note}</div>` : ''}
+      </div>`);
+    }
 
     if (step.narrative && step.narrative.length) {
       await story(step.narrative);
@@ -576,12 +742,26 @@
 
     if (st.step >= FC.steps.length - 1) {
       (async () => {
+        if (FC.ending && FC.ending.visual) await showVisual(FC.ending.visual, '结局');
         if (FC.ending && FC.ending.lines) await story(FC.ending.lines);
         advancing = false;
         showSummary();
       })();
       return;
     }
+
+    const leaving = FC.steps[st.step];
+    if (leaving && leaving.key === 'workup') {
+      const picked = new Set(st.picked);
+      (async () => {
+        try { await showWorkupResults(picked); } catch (e) { /* 忽略 */ }
+        st.step += 1;
+        saveSession();
+        enterStep(true).finally(() => { advancing = false; });
+      })();
+      return;
+    }
+
     st.step += 1;
     saveSession();
     enterStep(true).finally(() => { advancing = false; });
@@ -740,6 +920,10 @@
     const brt = $('#btn-flow-restart'); if (brt) brt.addEventListener('click', restart);
     const bb = $('#btn-flow-back');   if (bb) bb.addEventListener('click', () => showScreen('screen-start'));
     const bc = $('#btn-flow-copy');   if (bc) bc.addEventListener('click', copyResult);
+
+    /* 环节三 · 床旁影像切换 */
+    document.querySelectorAll('.mm-tab').forEach(b =>
+      b.addEventListener('click', () => renderMedia(b.dataset.media)));
 
     /* 首页与结算页的入口 */
     document.querySelectorAll('[data-open-flow]').forEach(b =>

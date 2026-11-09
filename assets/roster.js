@@ -1,18 +1,17 @@
 /* ============================================================
-   使用登记（模块 D）—— 基本信息 + 使用前问卷
+   使用登记（模块 D）—— 只收基本信息
    ------------------------------------------------------------
-   两步：
-     第 1 步  基本信息（姓名 / 单位科室 / 身份）
-     第 2 步  使用前问卷（复用 SURVEY 的 21 题）
-   两步都完成后合成一份完整回执，可一键复制发给教学秘书。
+   一步：基本信息（姓名 / 单位科室 / 身份）。
+   问卷统一放到训练结束后（复用 SURVEY 的 21 题），
+   登记 + 训练后问卷都完成后，回执会合成完整答案，可一键复制发给教学秘书。
 
    存储：localStorage（键 nec_roster_v1），不发起任何网络请求。
          数据只存在于填写者本人的浏览器里，服务端收不到，
          所以采用「回执制」——由填写者把回执复制后发出。
 
    入口：
-     1) 首页「使用登记」按钮
-     2) 点「开始训练」时软拦截（未登记 → 基本信息；已登记未答卷 → 问卷）
+     只有首页「使用登记」按钮（可选填）；
+     「开始训练」不再拦截登记 —— 点进去直接开始训练。
    ============================================================ */
 
 (function () {
@@ -185,10 +184,10 @@
     if (copy) copy.hidden = true;
     if (go) go.hidden = true;
     if (closeBtn) closeBtn.hidden = false;
-    if (save) { save.hidden = false; save.textContent = registered() ? '保存并继续' : '下一步 · 填问卷'; save.classList.remove('ghost'); }
+    if (save) { save.hidden = false; save.textContent = '保存登记'; save.classList.remove('ghost'); }
     setTitle('先留个名字');
     const note = $('#roster-note');
-    if (note) note.textContent = '带 * 为必填　·　下一步是使用前问卷';
+    if (note) note.textContent = '带 * 为必填　·　问卷在训练结束后填写';
   }
 
   function showReceipt(v, answers) {
@@ -215,11 +214,8 @@
     const b = $('#btn-roster-open');
     if (!b) return;
     const r = readRaw();
-    if (r && r.name && r.preDone) {
+    if (r && r.name) {
       b.textContent = '✓ 已登记 · ' + r.name;
-      b.classList.add('roster-on');
-    } else if (r && r.name) {
-      b.textContent = '✎ 登记 · 还差问卷';
       b.classList.add('roster-on');
     } else {
       b.textContent = '✎ 使用登记';
@@ -234,8 +230,8 @@
     const mask = $('#roster-mask');
     if (!mask) return;
     const r = readRaw();
-    /* 已完成任一份问卷（前测或后测）就展示回执，而不是空白表单（C-05） */
-    if (r && r.name && (r.preDone || r.surveyDone)) { showReceipt(r, r.survey || {}); openMask('#btn-roster-copy'); }
+    /* 已登记就展示回执，而不是空白表单 */
+    if (r && r.name) { showReceipt(r, r.survey || {}); openMask('#btn-roster-copy'); }
     else { showForm(); openMask('#rf-name'); }
   }
 
@@ -274,27 +270,18 @@
     writeRaw(v);
     refreshHomeBadge();
 
-    // 进第 2 步：只做前测（A 基本信息 + B 基线能力自评）
-    closeMask();
-
-    /* 已登记且前测已完成：不再重复发问卷，回执或直接续训（C-05） */
-    if (preDone()) {
-      if (pendingStart) {
-        pendingStart = false;
-        if (typeof toast === 'function') toast('登记完成，开始训练');
-        if (window.FLOW && typeof window.FLOW.start === 'function') window.FLOW.start();
-        return;
-      }
-      showReceipt(v, v.survey || {});
-      openMask('#btn-roster-copy');
-      if (typeof toast === 'function') toast('基本信息已更新');
+    /* 问卷统一放到训练结束后做（2026-10-26 调整）：登记只收基本信息 */
+    if (pendingStart) {
+      pendingStart = false;
+      closeMask();
+      if (typeof toast === 'function') toast('登记完成，开始训练');
+      if (window.FLOW && typeof window.FLOW.start === 'function') window.FLOW.start();
       return;
     }
 
-    if (window.SURVEY && typeof window.SURVEY.open === 'function') {
-      beginSurveyFlow();
-      window.SURVEY.open('roster', ['A', 'B']);
-    }
+    showReceipt(v, v.survey || {});
+    openMask('#btn-roster-copy');
+    if (typeof toast === 'function') toast('登记已保存');
   }
 
   /* 第 2 步完成（由 survey.js 回调）。secs 为本次所答分部 */
@@ -401,10 +388,12 @@
     const go = $('#btn-roster-go');
     if (go) go.addEventListener('click', goTrain);
 
-    /* 结算页的「去填写」→ 打开后测（C/D/E） */
+    /* 结算页的「去填写」→ 打开完整问卷（A–E 全部五部分） */
     const ps = $('#btn-post-survey');
     if (ps) ps.addEventListener('click', () => {
-      if (window.SURVEY && typeof window.SURVEY.open === 'function') window.SURVEY.open('post', ['C', 'D', 'E']);
+      if (window.SURVEY && typeof window.SURVEY.open === 'function') {
+        window.SURVEY.open('post', ['A', 'B', 'C', 'D', 'E']);
+      }
     });
 
     const mask = $('#roster-mask');
@@ -423,23 +412,6 @@
 
     refreshHomeBadge();
   });
-
-  /* 软拦截：点「开始训练」时检查登记与前测 */
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest && e.target.closest('[data-open-flow]');
-    if (!btn) return;
-    if (registered() && preDone()) return;      // 都完成，直接放行
-    e.preventDefault();
-    e.stopPropagation();
-    if (registered()) {
-      // 只差前测 → 直接进问卷
-      pendingStart = true;
-      beginSurveyFlow();
-      if (window.SURVEY && typeof window.SURVEY.open === 'function') window.SURVEY.open('roster', ['A', 'B']);
-    } else {
-      open(true);
-    }
-  }, true);
 
   window.ROSTER = {
     open, close, record, registered, preDone, postDone,

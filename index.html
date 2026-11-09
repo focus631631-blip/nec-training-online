@@ -3,48 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="新生儿坏死性小肠结肠炎（NEC）NICU 血便九环节临床决策训练：真实影像、病例复盘、使用前问卷与教学评价。">
-<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="新生儿坏死性小肠结肠炎（NEC）NICU 血便九环节临床决策训练：真实影像、病例复盘、训练后问卷与教学评价。">
 <meta name="theme-color" content="#070D18">
+<script>try{if(localStorage.getItem("nec_big_font")==="1"){document.documentElement.dataset.big="1";}}catch(e){}</script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="NEC 虚拟病例决策舱 · NICU 血便九环节决策训练">
 <meta property="og:description" content="一例 NEC，从头走到手术台：真实影像、九环节临床决策、病例复盘与教学评价。">
 <title>NEC 虚拟病例决策舱 · NICU 血便九环节决策训练</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="stylesheet" href="assets/style.css?v=20261018g">
+<link rel="stylesheet" href="assets/style.css?v=20261104a">
 </head>
 <body>
-<div id="access-gate" style="position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:#070D18;color:#E6EDF7;font-family:system-ui,-apple-system,'PingFang SC',sans-serif;padding:24px;">
-  <div style="width:min(420px,94vw);background:#111E33;border:1px solid #22354F;border-radius:16px;padding:26px;box-shadow:0 20px 60px rgba(0,0,0,.5);">
-    <div style="font-size:12px;letter-spacing:2px;color:#22D3EE;font-weight:700;margin-bottom:8px;">NEC 训练舱 · 在线版</div>
-    <h2 style="font-size:22px;margin:0 0 8px;">请输入访问码</h2>
-    <p style="font-size:13px;line-height:1.7;color:#9FB2CC;margin:0 0 18px;">仅限教学使用。访问码请向黄老师或科室教学秘书索取。</p>
-    <input id="access-code" type="password" autocomplete="off" placeholder="访问码"
-      style="width:100%;box-sizing:border-box;background:#0B1424;border:1px solid #22354F;border-radius:10px;color:#E6EDF7;padding:12px 14px;font-size:15px;outline:none;">
-    <div id="access-err" style="min-height:20px;color:#FCA5A5;font-size:12px;margin:8px 0 4px;"></div>
-    <button id="access-enter" type="button" style="width:100%;border:0;border-radius:999px;padding:13px;background:linear-gradient(120deg,#22D3EE,#38BDF8);color:#04121C;font-weight:800;font-size:15px;cursor:pointer;">进入训练</button>
-    <p style="font-size:11px;line-height:1.6;color:#63799A;margin:14px 0 0;">访问码只是减少误入，不是医疗级安全措施；请勿转发链接与患者影像。</p>
-  </div>
-</div>
-<script>
-(function(){
-  var KEY='nec_online_ok';
-  var gate=document.getElementById('access-gate');
-  try{ if(sessionStorage.getItem(KEY)==='1'){ gate.remove(); return; } }catch(e){}
-  var input=document.getElementById('access-code');
-  var err=document.getElementById('access-err');
-  function enter(){
-    if(input.value.trim()==='NEC2026'){
-      try{ sessionStorage.setItem(KEY,'1'); }catch(e){}
-      gate.remove();
-    } else { err.textContent='访问码不正确，请重新输入'; input.select(); }
-  }
-  document.getElementById('access-enter').addEventListener('click',enter);
-  input.addEventListener('keydown',function(e){ if(e.key==='Enter') enter(); });
-  setTimeout(function(){ input.focus(); },100);
-})();
-</script>
-
 <noscript><div style="padding:24px;color:#E6EDF7;background:#070D18;font-family:sans-serif;">本训练需要启用 JavaScript 才能运行，请在浏览器设置中开启后刷新页面。</div></noscript>
 <div class="backdrop"></div>
 
@@ -53,7 +22,7 @@
   <!-- ================= 开始页 ================= -->
   <section id="screen-start" class="screen active">
     <div class="start-card">
-      <div class="start-badge">虚拟病例决策舱 · V1.3 · 在线版</div>
+      <div class="start-badge">虚拟病例决策舱 · V2.10</div>
       <h1 class="start-title">一例 NEC，从头走到手术台</h1>
       <p class="start-sub">NICU 血便全程决策训练　·　九个环节　·　真实影像与患儿录像</p>
       <p class="start-org">郑州大学第三附属医院（河南省妇幼保健院）新生儿外科 · 新生儿科</p>
@@ -66,8 +35,8 @@
 
       <div class="start-stats">
         <div class="stat-chip"><b>9</b><span>训练环节</span></div>
-        <div class="stat-chip"><b>10</b><span>张真实影像</span></div>
-        <div class="stat-chip"><b>1</b><span>段患儿录像</span></div>
+        <div class="stat-chip"><b>11</b><span>张真实影像</span></div>
+        <div class="stat-chip"><b>5</b><span>段床旁视频</span></div>
         <div class="stat-chip"><b>4</b><span>训练模块</span></div>
       </div>
 
@@ -75,12 +44,13 @@
         <button class="btn" type="button" data-open-flow>开始训练 · NICU 血便九环节</button>
         <button class="btn ghost" id="btn-roster-open" type="button">✎ 使用登记</button>
         <button class="btn ghost" id="btn-gallery-start" type="button">▣ 影像资料库</button>
+        <button class="btn-big" type="button" data-big-toggle aria-pressed="false" title="课堂投影时切换更大字号"><span class="aa">Aa</span><span class="lbl">大字</span></button>
       </div>
       <p class="start-alt">
-        从 <b>NICU</b> 开始，以「大便带血」为首发症状，一路走到<b>肠穿孔手术</b>和术后管理。
-        没有产房环节 —— 由你主导判断；诊断明确后与小儿外科共同约定升级条件，是一条线上的接力，而不是两科分头决策。
+        从 <b>NICU</b> 开始，以「大便带血」为首发症状，一路走到<b>剖腹探查手术</b>和术后管理。
+        没有产房环节 —— 由你主导判断；内科治疗期间动态评估，病情恶化即请小儿外科会诊、在穿孔前手术，是两个科一条线上的接力。
       </p>
-      <p class="start-org" style="margin-top:10px;">仅供教学使用 · 影像已做身份脱敏 · 请勿公开传播 · 在线版
+      <p class="start-org" style="margin-top:10px;">仅供教学使用 · 影像中的床号/身份标识已模糊处理 · 请勿公开传播
         <button type="button" id="btn-clear-local" style="background:none;border:0;color:var(--text-3);text-decoration:underline;cursor:pointer;font:inherit;padding:0;margin-left:10px;">清除本机数据</button>
       </p>
 
@@ -88,12 +58,12 @@
         <button class="start-mod hi" type="button" data-open-flow>
           <div class="sm-kicker">模块 A · 全程病例</div>
           <div class="sm-name">血便九环节决策训练</div>
-          <div class="sm-desc">临床症状 → 查体 → 辅助检查 → 诊断 → 外科会诊 → 内科治疗 → 病情转折 → 手术决策 → 术后管理。每个环节先弹出真实影像，再让你做判断；都可以选「暂不处理」，并看到代价。</div>
+          <div class="sm-desc">临床症状 → 查体 → 辅助检查 → 诊断 → 内科治疗 → 病情转折 → 外科会诊 → 手术决策 → 术后管理。每个环节先弹出真实影像，再让你做判断；都可以选「暂不处理」，并看到代价。</div>
         </button>
-        <button class="start-mod" type="button" data-open-survey="home">
-          <div class="sm-kicker">模块 B · 使用前问卷</div>
-          <div class="sm-name">先告诉我们你是谁</div>
-          <div class="sm-desc">基本信息与基线能力自评（约 10 题）。使用意愿、内容偏好与推送意愿在训练结束后填写，用于前后对比。</div>
+        <button class="start-mod" type="button" data-open-survey="post" data-sections="A,B,C,D,E">
+          <div class="sm-kicker">模块 B · 训练后问卷</div>
+          <div class="sm-name">把这份问卷填完</div>
+          <div class="sm-desc">基本信息、基线能力自评、使用意愿、内容偏好与推送意愿，共 21 题。建议训练结束后填写；基线自评按训练前的状态作答。</div>
         </button>
         <button class="start-mod" type="button" data-open-eval="home">
           <div class="sm-kicker">模块 C · 教学评价表</div>
@@ -114,6 +84,7 @@
       <div class="stage-track" id="flow-track"></div>
       <div class="topbar-right">
         <div class="score-live">累计得分 <b id="flow-score" aria-live="polite">0</b></div>
+        <button class="btn-big" type="button" data-big-toggle aria-pressed="false" title="切换更大字号"><span class="aa">Aa</span><span class="lbl">大字</span></button>
         <button class="btn small ghost" id="btn-flow-quit">退出训练</button>
       </div>
     </div>
@@ -140,10 +111,42 @@
         <div class="stream-head">
           <div>
             <div class="stage-name" id="flow-step-name">环节一 · 临床症状</div>
-            <div class="stage-time" id="flow-step-time">生后第 11 天 · 08:20</div>
+            <div class="stage-time" id="flow-step-time">生后第 11 天 · 02:00</div>
           </div>
         </div>
         <div class="stream" id="flow-stream" role="log" aria-live="polite" aria-relevant="additions"></div>
+
+        <!-- 环节三 · 床旁影像模块（三按钮切换；超声并入「肚子」） -->
+        <div class="media-module" id="flow-media-module" hidden>
+          <div class="mm-tabs">
+            <button class="mm-tab on" type="button" data-media="abdomen">肚子</button>
+            <button class="mm-tab" type="button" data-media="skin">皮肤</button>
+            <button class="mm-tab" type="button" data-media="lung">肺部</button>
+          </div>
+          <div class="mm-stage" id="flow-media-stage"></div>
+        </div>
+
+        <!-- 环节四 · 辅助检查结果（大字） -->
+        <div class="lab-module" id="flow-lab-module" hidden>
+          <div class="lm-head">辅助检查结果 · 03:45</div>
+          <div class="lm-grid">
+            <div class="lm-card">
+              <div class="lm-name">血常规 · CRP</div>
+              <div class="lm-row"><span>白细胞</span><b>22</b><i>×10⁹/L</i></div>
+              <div class="lm-row"><span>中性粒细胞</span><b>76</b><i>%</i></div>
+              <div class="lm-row"><span>血小板</span><b>100</b><i>×10⁹/L</i></div>
+              <div class="lm-row hi"><span>C 反应蛋白</span><b>3.0</b><i>mg/dL</i></div>
+            </div>
+            <div class="lm-card">
+              <div class="lm-name">腹部平片</div>
+              <p class="lm-text">肠管充气不均，部分肠管扩张，肠间隙增宽；<b>未见明确肠壁积气</b>，未见门静脉积气及游离气体。</p>
+            </div>
+            <div class="lm-card">
+              <div class="lm-name">腹部超声</div>
+              <p class="lm-text">肠壁内可见<b>点状强回声</b>，提示<b>肠壁积气</b>；肠壁血流信号尚可，腹腔未见明显积液。</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 右栏 -->
@@ -153,7 +156,7 @@
           <div class="action-scroll" id="flow-actions"></div>
           <div class="advance-bar">
             <div class="advance-hint" id="flow-hint">勾选你认为必须完成的动作</div>
-            <div style="display:flex;gap:10px;">
+            <div class="advance-btns">
               <button class="btn small" id="btn-flow-submit" disabled>提交本环节</button>
               <button class="btn small ghost" id="btn-flow-next" disabled>进入下一环节</button>
             </div>
@@ -207,8 +210,8 @@
 
       <div class="sum-post-tip" id="flow-sum-posttip" hidden>
         <div class="spt-txt">
-          <b>还有一份「使用后问卷」</b>
-          <span>训练已经做完，这时候评价才准。约 3 分钟，包括使用意愿、内容偏好与推送意愿。</span>
+          <b>还有一份问卷没填</b>
+          <span>训练已经做完，这时候评价才准。约 5 分钟，涵盖基本信息、基线能力自评、使用意愿、内容偏好与推送意愿。</span>
         </div>
         <button class="btn small" id="btn-post-survey">去填写</button>
       </div>
@@ -216,7 +219,7 @@
       <div class="sum-foot">
         <button class="btn" id="btn-flow-review">病例复盘与指南要点</button>
         <button class="btn ghost" id="btn-demo-open">病理演变演示</button>
-        <button class="btn ghost" type="button" id="btn-post-survey2" data-open-survey="post" data-sections="C,D,E">使用后问卷</button>
+        <button class="btn ghost" type="button" id="btn-post-survey2" data-open-survey="post" data-sections="A,B,C,D,E">问卷</button>
         <button class="btn ghost" type="button" data-open-eval="flow">教学评价表</button>
         <button class="btn ghost" id="btn-flow-copy">复制训练结果</button>
         <button class="btn ghost" id="btn-flow-restart">再做一次</button>
@@ -225,11 +228,11 @@
     </div>
   </section>
 
-  <!-- ================= 使用前问卷 ================= -->
+  <!-- ================= 问卷（训练后填写） ================= -->
   <section id="screen-survey" class="screen">
     <div class="doc-wrap">
       <div class="doc-head">
-        <div class="doc-kicker">使用前问卷 · 模块 B</div>
+        <div class="doc-kicker">训练后问卷 · 模块 B</div>
         <h2 class="doc-title">先花两分钟，让我们知道你是谁</h2>
         <p class="doc-sub">
           问卷分两部分：基本信息与基线能力自评（约 10 题）。使用意愿、内容偏好与推送意愿
@@ -348,7 +351,7 @@
     </div>
     <div class="image-body" id="image-body"></div>
     <div class="modal-foot">
-      <span class="modal-note">全部影像均为真实临床或已发表文献图片，已做身份信息脱敏；仅用于征象识别训练，不作为诊断依据</span>
+      <span class="modal-note">全部影像均为真实临床或已发表文献图片，画面中的床号与身份标签已模糊处理；仅用于征象识别训练，不作为诊断依据</span>
       <button class="btn small ghost" id="btn-image-close2">关闭</button>
     </div>
   </div>
@@ -369,7 +372,7 @@
     </div>
     <div class="gallery-grid" id="gallery-grid"></div>
     <div class="modal-foot">
-      <span class="modal-note">影像全部为真实临床或已发表文献图片，均已做身份信息脱敏。外部开放获取素材：气腹片（CC BY 4.0）、NICU 早期腹平片（CC BY-NC-SA 4.0，仅供非商业教学）、正常肠管超声（CC BY 4.0）、呼吸窘迫胸片（CC0）· 点击任意影像可放大查看</span>
+      <span class="modal-note">影像全部为真实临床或已发表文献图片，画面中的床号与身份标签已模糊处理。外部开放获取素材：气腹片（CC BY 4.0）、NICU 早期腹平片（CC BY-NC-SA 4.0，仅供非商业教学）、正常肠管超声（CC BY 4.0）、呼吸窘迫胸片（CC0）· 点击任意影像可放大查看</span>
       <button class="btn small ghost" id="btn-gallery-close2">关闭</button>
     </div>
   </div>
@@ -441,7 +444,7 @@
 
     <div class="roster-body">
       <p class="roster-tip">
-        登记分两步：<b>先填基本信息，再填使用前问卷，两步都完成才算登记成功。</b>
+        登记只填<b>基本信息</b>（姓名 / 单位科室 / 身份）；问卷在训练结束后填写。
         信息只保存在你自己的浏览器里，不会自动上传；如需汇总，请点「复制登记信息」发送给黄老师或科室群。
         问卷与训练结果同理，只有你主动复制才会离开本机。
       </p>
@@ -489,14 +492,15 @@
   </div>
 </div>
 
-<script src="assets/imaging.js?v=20261018g"></script>
-<script src="assets/art.js?v=20261018g"></script>
-<script src="assets/review.js?v=20261018g"></script>
-<script src="assets/app.js?v=20261018g"></script>
-<script src="assets/flow_case.js?v=20261018g"></script>
-<script src="assets/flow.js?v=20261018g"></script>
-<script src="assets/survey.js?v=20261018g"></script>
-<script src="assets/evalform.js?v=20261018g"></script>
-<script src="assets/roster.js?v=20261018g"></script>
+<script src="assets/imaging.js?v=20261104a"></script>
+<script src="assets/art.js?v=20261104a"></script>
+<script src="assets/review.js?v=20261104a"></script>
+<script src="assets/app.js?v=20261104a"></script>
+<script src="assets/orprep.js?v=20261104a"></script>
+<script src="assets/flow_case.js?v=20261104a"></script>
+<script src="assets/flow.js?v=20261104a"></script>
+<script src="assets/survey.js?v=20261104a"></script>
+<script src="assets/evalform.js?v=20261104a"></script>
+<script src="assets/roster.js?v=20261104a"></script>
 </body>
 </html>

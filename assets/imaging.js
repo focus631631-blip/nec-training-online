@@ -11,7 +11,7 @@
        xr_pv   腹部平片 · 门静脉积气
        xr_pneu 腹部平片 · 肠壁积气
        stool   临床征象 · 血便
-       RDS_VIDEO 临床视频 · 新生儿呼吸窘迫（已做运动包络脱敏）
+       RDS_VIDEO 临床视频 · 新生儿呼吸窘迫（腹部标识已模糊）
 
    二、外部开放获取素材（4 幅，均为可自由使用的授权，已在下方逐条标注）
 
@@ -49,16 +49,22 @@ window.IMAGING = {
 
   /* ---------- 真实素材（外置 JPG，assets/real/） ---------- */
   REAL: {
-    gross:     'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/nec_gross.jpg',
-    stool:     'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/clinical_bloody_stool.jpg',
-    us_normal: 'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/us_normal.jpg',
-    us_pneu:   'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/us_pneumatosis.jpg',
-    us_pv:     'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/us_pv_gas.jpg',
-    xr_early:  'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/xr_early.jpg',
-    xr_pneu:   'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/xr_pneumatosis.jpg',
-    xr_pv:     'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/xr_pv_gas.jpg',
-    xr_pp:     'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/xr_pneumoperitoneum.jpg',
-    xr_rds:    'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/xr_rds.jpg'
+    gross:     'assets/real/nec_gross.jpg',
+    stool:     'assets/real/clinical_bloody_stool.jpg',
+    us_normal: 'assets/real/us_normal.jpg',
+    us_pneu:   'assets/real/us_pneumatosis.jpg',
+    us_pv:     'assets/real/us_pv_gas.jpg',
+    xr_early:  'assets/real/xr_early.jpg',
+    xr_pneu:   'assets/real/xr_pneumatosis.jpg',
+    xr_pv:     'assets/real/xr_pv_gas.jpg',
+    xr_pp:     'assets/real/xr_pneumoperitoneum.jpg',
+    xr_rds:    'assets/real/xr_rds.jpg',
+    ng_tube:   'assets/real/ng_tube.jpg',
+    postop_stoma: 'assets/real/postop_stoma.jpg',
+    stoma_stool:  'assets/real/stoma_stool.jpg',
+    followup_stoma: 'assets/real/followup_stoma.jpg',
+    abdomen_distension: 'assets/real/abdomen_distension.jpg',
+    us_bedside: 'assets/real/us_bedside.jpg'
   },
 
   /* ---------- 通用外框 ---------- */
@@ -74,12 +80,12 @@ window.IMAGING = {
   },
 
   /* ---------- 脱敏临床视频 ---------- */
-  RDS_VIDEO: 'https://6e8e529789ac46b1a6a8eb67ed751cdc.sg2.agentos-app.run/assets/real/rds_clip.mp4',
+  RDS_VIDEO: 'assets/real/lung_distress.mp4',
   _realVideo(src, caption, tag) {
     return `
     <div class="real-film">
       <div class="real-film-inner">
-        <video class="real-video" src="${src}" poster="assets/real/rds_clip_480.jpg" controls playsinline preload="none"></video>
+        <video class="real-video" src="${src}" poster="assets/real/lung_distress.jpg" controls playsinline preload="none"></video>
         <span class="real-tag">${tag}</span>
       </div>
       <div class="real-caption">${caption}</div>
@@ -89,6 +95,75 @@ window.IMAGING = {
   rdsVideo() {
     return this._realVideo(this.RDS_VIDEO,
       '临床视频 · 新生儿呼吸窘迫（三凹征、呼吸急促、呻吟）', '真实影像 · 临床视频');
+  },
+
+  /* ---------- 开场：NICU 夜间巡视（凌晨 2 点） ---------- */
+  NIGHT_ROUND: 'assets/real/opening_night.mp4',
+  nightRound() {
+    return `
+    <div class="real-film">
+      <div class="real-film-inner">
+        <video class="real-video" src="${this.NIGHT_ROUND}" poster="assets/real/opening_night.jpg"
+               controls playsinline preload="auto"></video>
+        <span class="real-tag">真实影像 · NICU 夜间巡视</span>
+      </div>
+      <div class="real-caption">NICU 夜间巡视 · 凌晨 2 点</div>
+    </div>`;
+  },
+
+  /* ---------- 查体：床旁观察（腹胀、呼吸功） ---------- */
+  ABDOMEN_CHECK: 'assets/real/abdomen_check.mp4',
+  abdomenCheck() {
+    return `
+    <div class="real-film">
+      <div class="real-film-inner">
+        <video class="real-video" src="${this.ABDOMEN_CHECK}" poster="assets/real/abdomen_check.jpg"
+               controls playsinline preload="auto" muted></video>
+        <span class="real-tag">真实影像 · 床旁观察</span>
+      </div>
+      <div class="real-caption">床旁观察 · 腹部膨隆、皮肤发亮，呼吸急促伴肋间凹陷</div>
+    </div>`;
+  },
+
+  /* ---------- 病情转折：呼吸困难加重 ---------- */
+  DYSPNEA_WORSE: 'assets/real/dyspnea_worse.mp4',
+  dyspneaWorse() {
+    return `
+    <div class="real-film">
+      <div class="real-film-inner">
+        <video class="real-video" src="${this.DYSPNEA_WORSE}" poster="assets/real/dyspnea_worse.jpg"
+               controls playsinline preload="auto" muted></video>
+        <span class="real-tag">真实影像 · 病情恶化</span>
+      </div>
+      <div class="real-caption">病情恶化 · 呼吸窘迫加重，腹胀明显</div>
+    </div>`;
+  },
+
+  /* ---------- 外科会诊前：气管插管 ---------- */
+  INTUBATION: 'assets/real/intubation.mp4',
+  intubation() {
+    return `
+    <div class="real-film">
+      <div class="real-film-inner">
+        <video class="real-video" src="${this.INTUBATION}" poster="assets/real/intubation.jpg"
+               controls playsinline preload="auto" muted></video>
+        <span class="real-tag">真实影像 · 气管插管</span>
+      </div>
+      <div class="real-caption">呼吸支持升级 · 气管插管、接呼吸机</div>
+    </div>`;
+  },
+
+  /* ---------- 血便：轻微推镜的动态影像（由真实照片生成，非 AI 重绘） ---------- */  STOOL_MOTION: 'assets/real/stool_motion.mp4',
+  stoolMotion() {
+    return `
+    <div class="real-film">
+      <div class="real-film-inner">
+        <video class="real-video" src="${this.STOOL_MOTION}" poster="assets/real/stool_motion.jpg"
+               autoplay loop muted playsinline preload="auto"></video>
+        <span class="real-tag">真实影像 · 临床</span>
+      </div>
+      <div class="real-caption">临床征象 · 血便（尿不湿可见血性及黏液样便）</div>
+    </div>`;
   },
 
   /* ---------- 胸部正位片：新生儿呼吸窘迫综合征 ---------- */
@@ -189,7 +264,13 @@ window.IMAGING = {
     xr_early:  ['腹部平片 · 肠管弥漫扩张、充气不均，未见肠壁积气、门静脉积气及游离气体', '真实影像 · 腹平片'],
     xr_rds:    ['胸部正位片 · 双肺透亮度普遍减低，呈弥漫细颗粒（磨玻璃）影，可见支气管充气征，肺容积减小，符合新生儿呼吸窘迫综合征', '真实影像 · 胸片'],
     xr_pp:     ['腹部平片 · 气腹：仰卧位可见前腹壁下大量游离气体，呈足球征/Rigler 征，肠管被压向中央；立位或左侧卧位才见膈下/肝上前新月形游离气体', '真实影像 · 气腹'],
-    stool:     ['临床征象 · 血便（尿不湿可见血性及黏液样便）', '真实影像 · 临床']
+    stool:     ['临床征象 · 血便（尿不湿可见血性及黏液样便）', '真实影像 · 临床'],
+    ng_tube:   ['内科治疗 · 胃肠减压：留置胃管接负压引流，回抽草绿色胃液', '真实影像 · 床旁'],
+    postop_stoma: ['术后造口 · 右下腹单腔造口，黏膜色泽可，周围皮肤轻度发红', '真实影像 · 术后'],
+    stoma_stool:  ['造口排出 · 造口袋内黄绿色稀便，量偏多', '真实影像 · 术后'],
+    followup_stoma: ['术后随访 · 造口黏膜红润，周围皮肤完好，体重 2.8 kg', '真实影像 · 随访'],
+    abdomen_distension: ['腹部膨隆 · 床旁外观，皮肤发亮、肠型可见', '真实影像 · 临床'],
+    us_bedside: ['床旁超声 · 探头扫查腹部，评估肠壁积气与腹腔积液', '真实影像 · 床旁操作']
   },
   realAsset(key) {
     const m = this._ASSET_META[key];

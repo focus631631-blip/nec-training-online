@@ -321,7 +321,9 @@ function popImage(spec, opts = {}) {
   return new Promise(resolve => {
     const IM = window.IMAGING;
     const render = IM && IM[spec.type];
-    if (typeof render !== 'function') { resolve(); return; }
+    /* 支持自定义 HTML 结果卡（如检验结果），否则走影像渲染器 */
+    const customHtml = spec.html || null;
+    if (!customHtml && typeof render !== 'function') { resolve(); return; }
 
     // 每次弹出递增序号：旧的关闭定时器/旧 Promise 不能影响新弹层
     const mySeq = ++popSeq;
@@ -333,8 +335,39 @@ function popImage(spec, opts = {}) {
     const media = $('#pop-media');
     $('#pop-step').textContent  = opts.step || '';
     $('#pop-title').textContent = spec.title || '';
-    $('#pop-note').textContent  = opts.note || '';
-    media.innerHTML = render.call(IM, spec.kind);
+    const noteEl = $('#pop-note');
+    const noteTxt = opts.note || spec.note || '';
+    noteEl.textContent = noteTxt;
+    noteEl.hidden = !noteTxt;
+    const foot = $('.pop-foot');
+    if (foot) foot.classList.toggle('no-note', !noteTxt);
+    media.innerHTML = customHtml || render.call(IM, spec.kind);
+    media.classList.toggle('result-frame', !!spec.fixedFrame);
+
+    /* 投影友好：让影像/视频尽量占满屏幕（保持比例，允许放大） */
+    (function fitMedia() {
+      if (spec.fixedFrame) return;           // 固定画框模式由 CSS 控制大小
+      const el = media.querySelector('video, img');
+      if (!el) return;                       // 化验结果卡等自定义内容不缩放
+      const fit = () => {
+        const iw = el.tagName === 'VIDEO' ? el.videoWidth : el.naturalWidth;
+        const ih = el.tagName === 'VIDEO' ? el.videoHeight : el.naturalHeight;
+        if (!iw || !ih) return;
+        const maxW = window.innerWidth * 0.94;
+        const maxH = window.innerHeight * (window.innerHeight < 800 ? 0.76 : 0.82);
+        const sc = Math.min(maxW / iw, maxH / ih);
+        el.style.width = Math.round(iw * sc) + 'px';
+        el.style.height = Math.round(ih * sc) + 'px';
+        el.style.maxWidth = 'none';
+        el.style.maxHeight = 'none';
+      };
+      if (el.tagName === 'VIDEO') {
+        el.addEventListener('loadedmetadata', fit, { once: true });
+        fit();
+      } else {
+        if (el.complete) fit(); else el.addEventListener('load', fit, { once: true });
+      }
+    })();
 
     const v = media.querySelector('video');
     if (v) {
@@ -385,7 +418,17 @@ const GALLERY_REAL = [
   { name: '腹部彩超 · 门静脉积气', key: 'us_pv' },
   { name: '胸部正位片 · 呼吸窘迫', key: 'xr_rds' },
   { name: '术中大体 · 坏死肠管',   key: 'gross' },
+  { name: '术后造口 · 右下腹单腔造口', key: 'postop_stoma' },
+  { name: '造口排出 · 黄绿色稀便', key: 'stoma_stool' },
+  { name: '术后随访 · 造口愈合',   key: 'followup_stoma' },
+  { name: '腹部膨隆 · 床旁外观',   key: 'abdomen_distension' },
+  { name: '床旁超声 · 探头扫查',   key: 'us_bedside' },
+  { name: '内科治疗 · 胃肠减压',   key: 'ng_tube' },
   { name: '临床视频 · 呼吸窘迫（已静音）', video: true },
+  { name: '临床视频 · 夜间巡视（已静音）', videoType: 'nightRound' },
+  { name: '临床视频 · 气管插管（已静音）', videoType: 'intubation' },
+  { name: '临床视频 · 呼吸困难加重（已静音）', videoType: 'dyspneaWorse' },
+  { name: '临床视频 · 床旁观察（已静音）', videoType: 'abdomenCheck' },
 ];
 
 function renderGallery() {
@@ -401,6 +444,10 @@ function renderGallery() {
     if (item.video) {
       spec = { type: 'rdsVideo', title: item.name };
       card.innerHTML = `<div class="gal-thumb">${IMAGING.rdsVideo()}</div>
+        <div class="gal-name">${item.name}</div>`;
+    } else if (item.videoType && typeof IMAGING[item.videoType] === 'function') {
+      spec = { type: item.videoType, title: item.name };
+      card.innerHTML = `<div class="gal-thumb">${IMAGING[item.videoType]()}</div>
         <div class="gal-name">${item.name}</div>`;
     } else {
       spec = { type: 'asset', kind: item.key, title: item.name };
@@ -596,3 +643,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+/* ============================================================
+   大字号（课堂投影）模式
+   ------------------------------------------------------------
+   把全站字号提升一档（CSS 变量 --fs: 1 → 1.15），用于教室投影；
+   可随时切回标准字号，选择记在本机浏览器。
+   ============================================================ */
+(function () {
+  const KEY = 'nec_big_font';
+
+  function isOn() {
+    try {
+      if (localStorage.getItem(KEY) === '1') return true;
+      if (localStorage.getItem(KEY) === '0') return false;
+    } catch (e) { /* ignore */ }
+    return document.documentElement.dataset.big === '1';
+  }
+
+  function paint(on) {
+    document.documentElement.dataset.big = on ? '1' : '0';
+    document.querySelectorAll('[data-big-toggle]').forEach(btn => {
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      const lbl = btn.querySelector('.lbl');
+      if (lbl) lbl.textContent = on ? '大字开' : '大字';
+      btn.title = on ? '切回标准字号' : '课堂投影时切换更大字号';
+    });
+  }
+
+  function toggle() {
+    const on = !isOn();
+    try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) { /* ignore */ }
+    paint(on);
+    if (typeof toast === 'function') toast(on ? '已切换为大字号（课堂投影）' : '已切回标准字号');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    paint(isOn());
+    document.querySelectorAll('[data-big-toggle]').forEach(btn =>
+      btn.addEventListener('click', toggle));
+  });
+})();
