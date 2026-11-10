@@ -87,7 +87,7 @@ window.FLOW_CASE = {
       ],
       patient: {
         vitals: { hr: 162, rr: 58, bp: '58/34', temp: 36.9, spo2: 96, abd: 29 },
-        labs: { crp: 0.6, plt: 196, lac: '1.6', be: '-2' },
+        labs: { crp: 6, plt: 196, lac: '1.6', be: '-2' },
         flags: ['血便', '胃潴留', '腹部较昨日膨隆'],
         note: '交接班记录：腹部较昨日明显膨隆'
       },
@@ -144,7 +144,7 @@ window.FLOW_CASE = {
       ],
       patient: {
         vitals: { hr: 166, rr: 60, bp: '56/32', temp: 36.8, spo2: 95, abd: 29 },
-        labs: { crp: 0.6, plt: 196, lac: '1.6', be: '-2' },
+        labs: { crp: 6, plt: 196, lac: '1.6', be: '-2' },
         flags: ['血便', '胃潴留', '腹部较昨日膨隆'],
         note: '交接班记录：腹部较昨日明显膨隆，皮肤张力增高'
       },
@@ -196,7 +196,7 @@ window.FLOW_CASE = {
       ],
       patient: {
         vitals: { hr: 168, rr: 62, bp: '55/31', temp: 36.7, spo2: 95, abd: 29 },
-        labs: { crp: 3.0, plt: 100, lac: '3.0', be: '-4' },
+        labs: { crp: 30, plt: 100, lac: '3.0', be: '-4' },
         flags: ['血便', '胃潴留', '腹围较昨日增加 2 cm', '肠鸣音减弱'],
         note: '腹壁未见明显发红；肛周视诊未见裂口，肛门指检因腹胀暂缓'
       },
@@ -215,7 +215,7 @@ window.FLOW_CASE = {
           result: { title: '血气分析（02:50 采血）', rows: [['pH', '7.30', ''], ['二氧化碳分压', '42', 'mmHg'], ['乳酸', '3.0', 'mmol/L'], ['碱剩余', '-4', 'mmol/L']], foot: '动脉血气 · 报告 03:02' },
           feedback: '乳酸与碱剩余反映的是全身灌注。它们决定这个孩子今晚要不要按重症来管。' },
         { id: 'f3a4', group: '检验', kind: 'good', label: '血常规与 C 反应蛋白、降钙素原',
-          result: { title: '血常规 · CRP · PCT（02:50 采血）', rows: [['白细胞', '22', '×10⁹/L'], ['中性粒细胞', '76', '%'], ['血小板', '100', '×10⁹/L'], ['C 反应蛋白', '3.0', 'mg/dL'], ['降钙素原', '0.8', 'ng/mL']], foot: '报告 03:10 · 白细胞升高、血小板偏低、CRP 明显升高' },
+          result: { title: '血常规 · CRP · PCT（02:50 采血）', rows: [['白细胞', '22', '×10⁹/L'], ['中性粒细胞', '76', '%'], ['血小板', '100', '×10⁹/L'], ['C 反应蛋白', '30', 'mg/L'], ['降钙素原', '0.8', 'ng/mL']], foot: '报告 03:10 · 白细胞升高、血小板偏低、CRP 明显升高' },
           feedback: '留基线值。单次正常不能排除，关键看后续动态。' },
         { id: 'f3a5', group: '检验', kind: 'good', label: '血培养（在抗生素使用之前留取）',
           result: { title: '血培养（抗生素使用前留取）', rows: [['送检', '02:50 已送检', ''], ['终报', '48 h 出结果', '']], foot: '阳性会提前报告；培养结果出来前先按经验性抗生素覆盖' },
@@ -258,7 +258,7 @@ window.FLOW_CASE = {
       ],
       patient: {
         vitals: { hr: 170, rr: 62, bp: '54/30', temp: 36.7, spo2: 94, abd: 29.5 },
-        labs: { crp: 3.0, plt: 100, lac: '3.0', be: '-4', ph: '7.30', pco2: 42 },
+        labs: { crp: 30, plt: 100, lac: '3.0', be: '-4', ph: '7.30', pco2: 42 },
         flags: ['血便', '胃潴留', '腹围较昨日增加 2.5 cm', '肠鸣音减弱', '肠壁积气（超声）'],
         note: '腹平片未见明确肠壁积气，超声已见；两者不一致时以超声为准'
       },
@@ -315,7 +315,7 @@ window.FLOW_CASE = {
       ],
       patient: {
         vitals: { hr: 170, rr: 62, bp: '54/30', temp: 36.7, spo2: 94, abd: 29.5 },
-        labs: { crp: 3.0, plt: 100, lac: '3.0', be: '-4', ph: '7.30', pco2: 42 },
+        labs: { crp: 30, plt: 100, lac: '3.0', be: '-4', ph: '7.30', pco2: 42 },
         flags: ['血便', '胃潴留', '腹围较昨日增加 2.5 cm', '肠鸣音减弱', '肠壁积气（超声）'],
         note: '当前奶量 180 ml/kg/d，高流量吸氧'
       },
@@ -373,12 +373,12 @@ window.FLOW_CASE = {
       narrative: [
         { scene: 'nicu', speaker: '旁白', text: '六小时后。内科治疗没有把病情「按住」。' },
         { scene: 'nicu', speaker: '新生儿科医师', side: 'left', portrait: 'neonatologist', text: '肚子比上午更胀，腹壁发亮。刚才连着两次呼吸暂停，血氧掉到 85，血气 pH 7.22，乳酸 5.1。' },
-        { scene: 'nicu', speaker: '旁白', text: 'CRP 从 3.0 涨到 6.8，血小板掉到 74，尿量只剩 0.5 ml/kg/h。孩子已经不在「再观察」的阶段了。' },
+        { scene: 'nicu', speaker: '旁白', text: 'CRP 从 30 涨到 68，血小板掉到 74，尿量只剩 0.5 ml/kg/h。孩子已经不在「再观察」的阶段了。' },
         { scene: 'nicu', speaker: '系统', tone: 'sys', text: '这一刻只有两个选择：叫外科，或者再等一等。' }
       ],
       patient: {
         vitals: { hr: 186, rr: 78, bp: '44/22', temp: 38.0, spo2: 85, abd: 31.5 },
-        labs: { crp: 6.8, plt: 74, lac: '5.1', be: '-9', ph: '7.22', pco2: 38 },
+        labs: { crp: 68, plt: 74, lac: '5.1', be: '-9', ph: '7.22', pco2: 38 },
         flags: ['持续腹胀', '呼吸暂停', '血氧下降', '血小板进行性下降', '乳酸升高', '尿量减少'],
         note: '内科治疗 6 小时后病情继续恶化：呼吸衰竭、尿量 0.5 ml/kg/h'
       },
@@ -429,13 +429,13 @@ window.FLOW_CASE = {
       },
       narrative: [
         { scene: 'nicu', speaker: '旁白', text: '十五分钟后，小儿外科医生到了床旁。' },
-        { scene: 'nicu', speaker: '外科医师', side: 'right', text: '肚子摸上去是硬的，腹壁发亮，肠鸣音听不到。CRP 6.8、血小板 74、乳酸 5.1——这个孩子内科治不下去了。' },
+        { scene: 'nicu', speaker: '外科医师', side: 'right', text: '肚子摸上去是硬的，腹壁发亮，肠鸣音听不到。CRP 68、血小板 74、乳酸 5.1——这个孩子内科治不下去了。' },
         { scene: 'nicu', speaker: '外科医师', side: 'right', text: '我的意见是手术。现在还没有气腹，但等到有气腹，切掉的肠管会更多。' },
         { scene: 'nicu', speaker: '系统', tone: 'sys', text: '外科的意见是明确的。接下来你要做的是：把手术这件事组织起来。' }
       ],
       patient: {
         vitals: { hr: 188, rr: 76, bp: '45/24', temp: 38.1, spo2: 88, abd: 32 },
-        labs: { crp: 6.8, plt: 74, lac: '5.1', be: '-9', ph: '7.22', pco2: 38 },
+        labs: { crp: 68, plt: 74, lac: '5.1', be: '-9', ph: '7.22', pco2: 38 },
         flags: ['腹壁张力高', '压痛明显', '肠鸣音消失', '乳酸持续升高', '外科会诊：建议手术'],
         note: '外科会诊意见：内科治疗无效，建议剖腹探查'
       },
@@ -499,7 +499,7 @@ window.FLOW_CASE = {
       ],
       patient: {
         vitals: { hr: 176, rr: 42, bp: '52/30', temp: 36.2, spo2: 97, abd: 32 },
-        labs: { crp: 7.8, plt: 70, lac: '3.8', be: '-6' },
+        labs: { crp: 78, plt: 70, lac: '3.8', be: '-6' },
         flags: ['已开腹', '回肠末段坏死约 25 cm', '腹腔淡血性渗出 5 ml', '近端肠管血运尚可'],
         note: '术中：坏死肠段界限清楚，近端切缘血运良好'
       },

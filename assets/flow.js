@@ -179,7 +179,7 @@
   const LAB_DEFS = [
     { key: 'ph',  label: 'pH',         unit: '' },
     { key: 'pco2',label: '二氧化碳分压', unit: 'mmHg' },
-    { key: 'crp', label: 'C 反应蛋白', unit: 'mg/dL' },
+    { key: 'crp', label: 'C 反应蛋白', unit: 'mg/L' },
     { key: 'plt', label: '血小板',     unit: '×10⁹/L' },
     { key: 'lac', label: '乳酸',       unit: 'mmol/L' },
     { key: 'be',  label: '碱剩余',     unit: 'mmol/L' },
@@ -223,8 +223,7 @@
       LAB_DEFS.forEach(d => {
         const v = p.labs[d.key];
         if (v === undefined) return;
-        // CRP 用 mg/dL，保留一位小数（3.0 / 6.8 / 7.8），避免显示成整数 3
-        const shown = d.key === 'crp' && !isNaN(parseFloat(v)) ? Number(v).toFixed(1) : v;
+        const shown = v;
         const div = document.createElement('div');
         div.className = 'lab';
         div.innerHTML = `<span class="lab-k">${d.label}</span>
